@@ -1,12 +1,12 @@
 ---
-- name: configure postfix main.cf
+- name: "[postfix] configure main.cf"
   template: src=templates/main.cf.j2 dest=/etc/postfix/main.cf owner=postfix group=postfix mode=0644
   notify:
     - reload postfix
 
-- name: configure postfix master.cf
-  template: src= templates/master.cf.j2 dest=/etc/postfix/master.cf owner=postfix group=postfix mode=0644
+- name: "[postfix] configure master.cf"
+  template: src=templates/master.cf.j2 dest=/etc/postfix/master.cf owner=postfix group=postfix mode=0644
   notify:
     - reload postfix
-- name: enable postfix
+- name: "[postfix] enable service"
   service: name=postfix state=running enabled=yes
