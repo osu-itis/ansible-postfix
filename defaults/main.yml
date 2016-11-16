@@ -1,0 +1,9 @@
+---
+postfix:
+  mydomain: {{ ansible_domain }}
+  myhostname: {{ ansible_fqdn }}
+  myorigin: {{ postfix.mydomain }}
+  mydestination: ''
+  mynetworks: '127.0.0.0/8'
+  local_recipient_maps: ''
+  local_transport: "error: local mail delivery is disabled"

@@ -1,0 +1,166 @@
+# Copyright (c) 2009 State University - Network Engineering
+# All rights reserved.
+#
+# This is the config for relay.oregonstate.edu
+# NOTE: this file is managed by Cfengine
+
+myhostname = {{ postfix.myhostname }}
+mydomain = {{ postfix.mydomain }}
+myorigin = {{ postfix.myorigin }}
+
+# comment this out if things get ugly
+content_filter = smtp-amavis:[127.0.0.1]:10024
+
+smtpd_banner = $myhostname ESMTP $mail_name
+setgid_group = postdrop
+biff = no
+
+mydestination = {{ postfix.mydestination }}
+
+# These are just a single file in our case.. can change to a list someday if needed
+mynetworks = {{ postfix.mynetworks }}
+relay_domains = {{ postfix.relay_domains }}
+
+# changing this default setting because we don't use NIS lookups
+# default is: alias_maps = hash:/etc/aliases, nis:mail.aliases
+alias_maps = hash:/etc/aliases
+
+# performance tweaks
+smtp_connect_timeout = 15s
+#smtp_helo_timeout = 150s
+
+# Changing default setting for this because we don't want to match subdomains of relay-domains
+parent_domain_matches_subdomains =
+    debug_peer_list,
+    fast_flush_domains,
+    mynetworks,
+    permit_mx_backup_networks,
+    qmqpd_authorized_clients,
+    smtpd_access_maps
+
+relay_recipient_maps =
+{% for line in postfix.relay_recipient_maps %}
+    {{ line }},
+{% endfor %}
+
+mailbox_size_limit = 0
+virtual_alias_maps =
+{% for line in postfix.virtual_alias_maps %}
+    {{ line }},
+{% endfor %}
+
+virtual_alias_domains =
+{% for line in postfix.virtual_alias_domains %}
+    {{ line }},
+{% endfor %}
+
+recipient_delimiter = +
+mailbox_command = /usr/bin/procmail -a "$EXTENSION"
+
+default_process_limit = 512
+message_size_limit = 100000000
+
+# Adding this option to avoid bouncing virus mails
+bounce_size_limit = 100000
+
+smtpd_helo_required = no
+
+transport_maps =
+{% for line in postfix.transport_maps %}
+    {{ line }},
+{% endfor %}
+
+local_destination_recipient_limit = 300
+
+fast_flush_domains =
+{% for line in postfix.fast_flush_domains %}
+    {{ line }},
+{% endfor %}
+
+# Some things to speed up performance of internal mail
+transport_retry_time = 5s
+smtpd_error_sleep_time = 0
+smtpd_soft_error_limit = 5
+smtpd_hard_error_limit = 10
+
+# added this to deal with other pesky users
+maps_rbl_reject_code = 550
+
+header_checks =
+{% for line in postfix.header_checks %}
+    {{ line }},
+{% endfor %}
+
+# Restrictions on connect - block hosts here!
+smtpd_client_restrictions =
+{% for line in postfix.smtpd_client_restrictions %}
+    {{ line }},
+{% endfor %}
+
+# Restrictions on HELO
+smtpd_helo_restrictions =
+{% for line in postfix.smtpd_helo_restrictions %}
+    {{ line }},
+{% endfor %}
+
+# In order to have the restriction take effect as soon as
+# possible, specify smtpd_delay_reject = no in the Postfix
+# main.cf configuration file. Doing so may cause unexpected
+# results with poorly implemented client software.
+smtpd_delay_reject = yes
+
+# Restrictions on RCPT TO
+smtpd_recipient_restrictions =
+{% for line in postfix.smtpd_recipient_restrictions %}
+    {{ line }},
+{% endfor %}
+
+# Restrictions on MAIL FROM
+smtpd_sender_restrictions =
+{% for line in postfix.smtpd_sender_restrictions %}
+    {{ line }},
+{% endfor %}
+
+# Restrictions on DATA
+smtpd_data_restrictions =
+{% for line in postfix.smtpd_data_restrictions %}
+    {{ line }},
+{% endfor %}
+
+{% if postfix.lmtp_enabled %}
+lmtp_tcp_port = 2003
+
+# lmtp auth stuff
+mailbox_transport = lmtp:localhost
+lmtp_sasl_auth_enable = {{ 'yes' if postfix.lmtp_sasl_auth_enable else 'no' }}
+lmtp_sasl_password_maps =
+{% for line in postfix.lmtp_sasl_password_maps %}
+    {{ line }},
+{% endfor %}
+lmtp_sasl_security_options = noanonymous
+lmtp_tls_policy_maps =
+{% for line in postfix.lmtp_tls_policy_maps %}
+    {{ line }},
+{% endfor %}
+
+lmtp_tls_CApath = {{ postfix.capath }}
+{% endif %}
+
+# SMTP auth stuff
+smtp_tls_CApath = {{ postfix.capath }}
+smtpd_sasl_auth_enable = {{ 'yes' if postfix.smtpd_sasl_auth_enable else 'no' }}
+smtpd_sasl_security_options = noanonymous
+smtpd_sasl_local_domain = ""
+broken_sasl_auth_clients = yes
+smtp_tls_security_level = may
+smtpd_tls_security_level = may
+smtpd_tls_auth_only = yes
+smtpd_tls_received_header = yes
+smtpd_tls_key_file = {{ postfix.smtpd_tls_key_file }}
+smtpd_tls_cert_file = {{ postfix.smtpd_tls_cert_file }}
+smtpd_tls_CAfile = {{ postfix.smtpd_tls_cafile }}
+smtpd_tls_mandatory_protocols = !SSLv2, !SSLv3
+smtpd_tls_protocols = !SSLv2, !SSLv3
+
+# Increase number if you want more verbose output
+smtpd_tls_loglevel = {{ postfix.smtpd_tls_loglevel }}

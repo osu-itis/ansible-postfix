@@ -1,0 +1,73 @@
+# Copyright (c) 2016 Oregon State University
+# All rights reserved.
+#
+# Postfix master process configuration file.
+# For syntax help, please see documentation at:
+# http://www.postfix.org/master.5.html
+#
+# ==========================================================================
+# service   type	private	unpriv	chroot	wakeup	maxproc	command + args
+# 		    (yes)	(yes)	(yes)	(never)	(50)
+# ==========================================================================
+smtp	    inet	    n	    -	    -	    -	    350	    smtpd
+pickup	    fifo	    n	    -	    -	    60	    1	    pickup
+{% if postfix.amavisd_enable %}
+    -o content_filter=
+    -o receive_override_options=no_header_body_checks
+{% endif %}
+cleanup	    unix	    n	    -	    -	    -	    0	    cleanup
+qmgr	    fifo	    n	    -	    -	    300	    1	    qmgr
+rewrite	    unix	    -	    -	    -	    -	    -	    trivial-rewrite
+bounce	    unix	    -	    -	    -	    -	    0	    bounce
+defer	    unix	    -	    -	    -	    -	    0	    bounce
+flush	    unix	    n	    -	    -	    1000?	0	    flush
+smtp	    unix	    -	    -	    -	    -	    -	    smtp
+relay       unix	    -	    -	    -	    -	    -	    smtp
+showq       unix	    n	    -	    -	    -	    -       showq
+error       unix	    -	    -	    -	    -	    -	    error
+local	    unix	    -	    n	    n	    -	    -	    local
+virtual	    unix	    -	    n	    n	    -	    -	    virtual
+lmtp	    unix	    -	    -	    n	    -	    100	    lmtp
+anvil       unix        -       -       n       -       1       anvil
+tlsmgr      unix        -       -       n       1000?   1       tlsmgr
+proxymap	unix	    -	    -	    n	    -	    -	    proxymap
+trace	    unix	    -	    -	    -	    -	    0	    bounce
+verify	    unix	    -	    -	    -	    -	    1	    verify
+scache      unix        -       -       -       -       1       scache
+discard     unix        -       -       -       -       -       discard
+smtps	    inet	    n	    -	    -	    -	    -	    smtpd
+    -o smtpd_tls_wrappermode=yes
+    -o smtpd_sasl_auth_enable=yes
+
+{% if postfix.amavisd_enable %}
+smtp-amavis unix        -       -       n       -       22      smtp
+    -o smtp_data_done_timeout=1200
+    -o smtp_send_xforward_command=yes
+    -o disable_dns_lookups=yes
+
+127.0.0.1:10025 inet    n       -       n       -       -       smtpd
+    -o content_filter=
+    -o local_recipient_maps=
+    -o relay_recipient_maps=
+    -o smtpd_restriction_classes=
+    -o smtpd_client_restrictions=
+    -o smtpd_helo_restrictions=
+    -o smtpd_sender_restrictions=
+    -o smtpd_recipient_restrictions=permit_mynetworks,reject
+    -o mynetworks=127.0.0.0/8
+    -o strict_rfc821_envelopes=yes
+    -o receive_override_options=no_unknown_recipient_checks,no_address_mappings,no_header_body_checks
+{% endif %}
+
+submission  inet        n       -       -       -       10      smtpd
+    -o smtpd_tls_auth_only=yes
+    -o smtpd_tls_security_level=may
+    -o smtpd_sasl_auth_enable=yes
+    -o smtpd_client_restrictions=permit_mynetworks,permit_sasl_authenticated,reject
+
+filter      unix        -       n       n       -       -       pipe
+    flags=Rq user=filter argv=/etc/postfix/filter -f ${sender} -- ${recipient}
+
+# this is for pesky sites that we just want to drop on the floor
+drop      unix  -       n       n       -       -       pipe
+    flags=F user=nobody argv=/bin/cat /dev/null
