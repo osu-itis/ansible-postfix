@@ -1,8 +1,11 @@
 ---
+
+# this will only work as 'defaults' if hash_behaviour=merge is set in ansible.cfg... so just set them in your vars
+
 postfix:
   mydomain: "{{ ansible_domain }}"
   myhostname: "{{ ansible_fqdn }}"
-  myorigin: "{{ postfix.mydomain }}"
+  myorigin: "{{ ansible_domain }}"
   mydestination: ''
   mynetworks: '127.0.0.0/8'
   local_recipient_maps: ''
