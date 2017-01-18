@@ -2,8 +2,9 @@ myhostname = {{ postfix.myhostname }}
 mydomain = {{ postfix.mydomain }}
 myorigin = {{ postfix.myorigin }}
 
-# comment this out if things get ugly
+{% if postfix.amavisd_enable is defined %}
 content_filter = smtp-amavis:[127.0.0.1]:10024
+{% endif %}
 
 smtpd_banner = $myhostname ESMTP $mail_name
 setgid_group = postdrop
@@ -31,22 +32,27 @@ parent_domain_matches_subdomains =
     permit_mx_backup_networks,
     qmqpd_authorized_clients,
     smtpd_access_maps
-
+{% if postfix. is defined %}
 relay_recipient_maps =
 {% for line in postfix.relay_recipient_maps %}
     {{ line }},
 {% endfor %}
+{% endif %}
 
 mailbox_size_limit = 0
+{% if postfix.virtual_alias_maps is defined %}
 virtual_alias_maps =
 {% for line in postfix.virtual_alias_maps %}
     {{ line }},
 {% endfor %}
+{% endif %}
 
+{% if postfix.virtual_alias_domains is defined %}
 virtual_alias_domains =
 {% for line in postfix.virtual_alias_domains %}
     {{ line }},
 {% endfor %}
+{% endif %}
 
 recipient_delimiter = +
 mailbox_command = /usr/bin/procmail -a "$EXTENSION"
@@ -59,17 +65,21 @@ bounce_size_limit = 100000
 
 smtpd_helo_required = no
 
+{% if postfix.transport_maps is defined %}
 transport_maps =
 {% for line in postfix.transport_maps %}
     {{ line }},
 {% endfor %}
+{% endif %}
 
 local_destination_recipient_limit = 300
 
+{% if postfix.fast_flush_domains is defined %}
 fast_flush_domains =
 {% for line in postfix.fast_flush_domains %}
     {{ line }},
 {% endfor %}
+{% endif %}
 
 # Some things to speed up performance of internal mail
 transport_retry_time = 5s
@@ -80,22 +90,28 @@ smtpd_hard_error_limit = 10
 # added this to deal with other pesky users
 maps_rbl_reject_code = 550
 
+{% if postfix.header_checks is defined %}
 header_checks =
 {% for line in postfix.header_checks %}
     {{ line }},
 {% endfor %}
+{% endif %}
 
+{% if postfix.smtpd_client_restrictions is defined %}
 # Restrictions on connect - block hosts here!
 smtpd_client_restrictions =
 {% for line in postfix.smtpd_client_restrictions %}
     {{ line }},
 {% endfor %}
+{% endif %}
 
+{% if postfix.smtpd_helo_restrictions is defined %}
 # Restrictions on HELO
 smtpd_helo_restrictions =
 {% for line in postfix.smtpd_helo_restrictions %}
     {{ line }},
 {% endfor %}
+{% endif %}
 
 # In order to have the restriction take effect as soon as
 # possible, specify smtpd_delay_reject = no in the Postfix
@@ -103,23 +119,29 @@ smtpd_helo_restrictions =
 # results with poorly implemented client software.
 smtpd_delay_reject = yes
 
+{% if postfix.smtpd_recipient_restrictions is defined %}
 # Restrictions on RCPT TO
 smtpd_recipient_restrictions =
 {% for line in postfix.smtpd_recipient_restrictions %}
     {{ line }},
 {% endfor %}
+{% endif %}
 
+{% if postfix.smtpd_sender_restrictions is defined %}
 # Restrictions on MAIL FROM
 smtpd_sender_restrictions =
 {% for line in postfix.smtpd_sender_restrictions %}
     {{ line }},
 {% endfor %}
+{% endif %}
 
+{% if postfix.smtpd_data_restrictions is defined %}
 # Restrictions on DATA
 smtpd_data_restrictions =
 {% for line in postfix.smtpd_data_restrictions %}
     {{ line }},
 {% endfor %}
+{% endif %}
 
 {% if postfix.lmtp_enabled %}
 lmtp_tcp_port = 2003
