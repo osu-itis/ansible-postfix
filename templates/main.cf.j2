@@ -2,7 +2,7 @@ myhostname = {{ postfix.myhostname }}
 mydomain = {{ postfix.mydomain }}
 myorigin = {{ postfix.myorigin }}
 
-{% if postfix.amavisd_enable is defined %}
+{% if postfix.amavisd_enable %}
 content_filter = smtp-amavis:[127.0.0.1]:10024
 {% endif %}
 
@@ -32,7 +32,7 @@ parent_domain_matches_subdomains =
     permit_mx_backup_networks,
     qmqpd_authorized_clients,
     smtpd_access_maps
-{% if postfix. is defined %}
+{% if postfix.relay_recipient_maps is defined %}
 relay_recipient_maps =
 {% for line in postfix.relay_recipient_maps %}
     {{ line }},
