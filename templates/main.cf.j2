@@ -1,3 +1,6 @@
+{% if postfix.compatibility_level is defined %}
+compatibility_level = {{ postfix.compatibility_level }}
+{% endif %}
 myhostname = {{ postfix.myhostname }}
 mydomain = {{ postfix.mydomain }}
 myorigin = {{ postfix.myorigin }}
