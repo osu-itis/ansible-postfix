@@ -6,33 +6,33 @@
 # service   type	private	unpriv	chroot	wakeup	maxproc	command + args
 # 		    (yes)	(yes)	(yes)	(never)	(50)
 # ==========================================================================
-smtp	    inet	    n	    -	    -	    -	    350	    smtpd
-pickup	    fifo	    n	    -	    -	    60	    1	    pickup
+smtp	    inet	    n	    -	    y	    -	    350	    smtpd
+pickup	    fifo	    n	    -	    y	    60	    1	    pickup
 {% if postfix.amavisd_enable %}
     -o content_filter=
     -o receive_override_options=no_header_body_checks
 {% endif %}
-cleanup	    unix	    n	    -	    -	    -	    0	    cleanup
-qmgr	    fifo	    n	    -	    -	    300	    1	    qmgr
-rewrite	    unix	    -	    -	    -	    -	    -	    trivial-rewrite
-bounce	    unix	    -	    -	    -	    -	    0	    bounce
-defer	    unix	    -	    -	    -	    -	    0	    bounce
-flush	    unix	    n	    -	    -	    1000?	0	    flush
-smtp	    unix	    -	    -	    -	    -	    -	    smtp
-relay       unix	    -	    -	    -	    -	    -	    smtp
-showq       unix	    n	    -	    -	    -	    -       showq
-error       unix	    -	    -	    -	    -	    -	    error
+cleanup	    unix	    n	    -	    y	    -	    0	    cleanup
+qmgr	    fifo	    n	    -	    y	    300	    1	    qmgr
+rewrite	    unix	    -	    -	    y	    -	    -	    trivial-rewrite
+bounce	    unix	    -	    -	    y	    -	    0	    bounce
+defer	    unix	    -	    -	    y	    -	    0	    bounce
+flush	    unix	    n	    -	    y	    1000?	0	    flush
+smtp	    unix	    -	    -	    y	    -	    -	    smtp
+relay       unix	    -	    -	    y	    -	    -	    smtp
+showq       unix	    n	    -	    y	    -	    -       showq
+error       unix	    -	    -	    y	    -	    -	    error
 local	    unix	    -	    n	    n	    -	    -	    local
 virtual	    unix	    -	    n	    n	    -	    -	    virtual
 lmtp	    unix	    -	    -	    n	    -	    100	    lmtp
 anvil       unix        -       -       n       -       1       anvil
 tlsmgr      unix        -       -       n       1000?   1       tlsmgr
 proxymap	unix	    -	    -	    n	    -	    -	    proxymap
-trace	    unix	    -	    -	    -	    -	    0	    bounce
-verify	    unix	    -	    -	    -	    -	    1	    verify
-scache      unix        -       -       -       -       1       scache
-discard     unix        -       -       -       -       -       discard
-smtps	    inet	    n	    -	    -	    -	    -	    smtpd
+trace	    unix	    -	    -	    y	    -	    0	    bounce
+verify	    unix	    -	    -	    y	    -	    1	    verify
+scache      unix        -       -       y       -       1       scache
+discard     unix        -       -       y       -       -       discard
+smtps	    inet	    n	    -	    y	    -	    -	    smtpd
     -o smtpd_tls_wrappermode=yes
     -o smtpd_sasl_auth_enable=yes
 
@@ -56,7 +56,7 @@ smtp-amavis unix        -       -       n       -       22      smtp
     -o receive_override_options=no_unknown_recipient_checks,no_address_mappings,no_header_body_checks
 {% endif %}
 
-submission  inet        n       -       -       -       10      smtpd
+submission  inet        n       -       y       -       10      smtpd
     -o smtpd_tls_auth_only=yes
     -o smtpd_tls_security_level=may
 {% if postfix.smtpd_sasl_auth_enable %}
