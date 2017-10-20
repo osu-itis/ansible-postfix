@@ -93,6 +93,9 @@ smtpd_hard_error_limit = 10
 # added this to deal with other pesky users
 maps_rbl_reject_code = 550
 
+# For when greylisting isn't working, fail open
+smtpd_policy_service_default_action = DUNNO
+
 {% if postfix.header_checks is defined %}
 header_checks =
 {% for line in postfix.header_checks %}
