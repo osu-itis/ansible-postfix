@@ -3,10 +3,14 @@
   template: src=templates/main.cf.j2 dest=/etc/postfix/main.cf owner=postfix group=postfix mode=0644
   notify:
     - reload postfix
+  tags:
+    - config
 
 - name: "[postfix] configure master.cf"
   template: src=templates/master.cf.j2 dest=/etc/postfix/master.cf owner=postfix group=postfix mode=0644
   notify:
     - reload postfix
+  tags:
+    - config
 - name: "[postfix] enable service"
   service: name=postfix state=running enabled=yes
