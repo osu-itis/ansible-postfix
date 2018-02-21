@@ -12,6 +12,7 @@ content_filter = smtp-amavis:[127.0.0.1]:10024
 smtpd_banner = $myhostname ESMTP $mail_name
 setgid_group = postdrop
 biff = no
+smtputf8_enable = no
 
 mydestination = {{ postfix.mydestination }}
 
