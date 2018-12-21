@@ -4,4 +4,4 @@
   with_items:
     - postfix
     - bsd-mailx
-
+    - postfix-pcre
