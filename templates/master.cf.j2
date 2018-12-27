@@ -72,3 +72,4 @@ filter      unix        -       n       n       -       -       pipe
 # this is for pesky sites that we just want to drop on the floor
 drop      unix  -       n       n       -       -       pipe
     flags=F user=nobody argv=/bin/cat /dev/null
+retry     unix  -       -       y       -       -       error
