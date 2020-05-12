@@ -192,5 +192,7 @@ smtpd_tls_loglevel = {{ postfix.smtpd_tls_loglevel }}
 # special for master.cf
 submission_smtpd_client_restrictions = check_client_access cidr:/etc/postfix/acl/osu-blacklist-cidr, permit_mynetworks, permit_sasl_authenticated, reject
 
-rbl_reply_maps = hash:/etc/postfix/acl/dnsbl-reply-map
+{% if postfix.rbl_reply_maps is defined %}
+rbl_reply_maps = {{ postfix.rbl_reply_maps }}
+{% endif %}
 
