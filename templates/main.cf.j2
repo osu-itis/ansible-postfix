@@ -196,3 +196,7 @@ submission_smtpd_client_restrictions = check_client_access cidr:/etc/postfix/acl
 rbl_reply_maps = {{ postfix.rbl_reply_maps }}
 {% endif %}
 
+{% if postfix.smtp_destination_concurrency_limit is defined %}
+smtp_destination_concurrency_limit = {{ postfix.smtp_destination_concurrency_limit }}
+{% endif %}
+
