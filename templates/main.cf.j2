@@ -183,8 +183,9 @@ smtpd_tls_received_header = yes
 smtpd_tls_key_file = {{ postfix.smtpd_tls_key_file }}
 smtpd_tls_cert_file = {{ postfix.smtpd_tls_cert_file }}
 smtpd_tls_CAfile = {{ postfix.smtpd_tls_cafile }}
-smtpd_tls_mandatory_protocols = !SSLv2, !SSLv3
-smtpd_tls_protocols = !SSLv2, !SSLv3
+smtpd_tls_mandatory_protocols = !SSLv2, !SSLv3, !TLSv1, !TLSv1.1
+smtpd_tls_protocols = !SSLv2, !SSLv3, !TLSv1, !TLSv1.1
+smtpd_tls_exclude_ciphers = aNULL
 
 # Increase number if you want more verbose output
 smtpd_tls_loglevel = {{ postfix.smtpd_tls_loglevel }}
