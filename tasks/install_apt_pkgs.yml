@@ -1,7 +1,6 @@
 ---
 - name: install postfix packages
-  apt: name={{item}} state=present update_cache=yes
-  with_items:
-    - postfix
-    - bsd-mailx
-    - postfix-pcre
+  apt:
+    name: ['postfix', 'bsd-mailx', 'postfix-pcre']
+    state: present
+    update_cache: yes
