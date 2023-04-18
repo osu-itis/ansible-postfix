@@ -151,25 +151,6 @@ smtpd_data_restrictions =
 {% endfor %}
 {% endif %}
 
-{% if postfix.lmtp_enabled %}
-lmtp_tcp_port = 2003
-
-# lmtp auth stuff
-mailbox_transport = lmtp:localhost
-lmtp_sasl_auth_enable = {{ 'yes' if postfix.lmtp_sasl_auth_enable else 'no' }}
-lmtp_sasl_password_maps =
-{% for line in postfix.lmtp_sasl_password_maps %}
-    {{ line }},
-{% endfor %}
-lmtp_sasl_security_options = noanonymous
-lmtp_tls_policy_maps =
-{% for line in postfix.lmtp_tls_policy_maps %}
-    {{ line }},
-{% endfor %}
-
-lmtp_tls_CApath = {{ postfix.capath }}
-{% endif %}
-
 # SMTP auth stuff
 smtp_tls_CApath = {{ postfix.capath }}
 smtpd_sasl_auth_enable = {{ 'yes' if postfix.smtpd_sasl_auth_enable else 'no' }}
